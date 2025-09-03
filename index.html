@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CS180 Portfolio</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>CS180 Portfolio</h1>
+            <p class="subtitle">Aditi Jain - Computer Vision Projects</p>
+        </header>
+
+        <nav class="tab-navigation">
+            <button class="tab-button active" data-tab="project0">Project 0</button>
+            <button class="tab-button" data-tab="project1">Project 1</button>
+            <button class="tab-button" data-tab="project2">Project 2</button>
+            <button class="tab-button" data-tab="project3">Project 3</button>
+            <button class="tab-button" data-tab="project4">Project 4</button>
+            <button class="tab-button" data-tab="project5">Project 5</button>
+        </nav>
+
+        <main class="content">
+            <div id="project0" class="tab-content active">
+                <h2>Project 0: Becoming Friends with Your Camera</h2>
+                <div class="project-info">
+                    <!-- Part 1: Selfie Comparison -->
+                    <div class="project-section">
+                        <h3>Part 1: Selfie - The Wrong Way vs. The Right Way</h3>
+                        <p class="section-description">
+                            Comparing close-up distorted selfies with zoomed-in portraits taken from a distance to understand how camera distance affects facial proportions and perspective distortion.
+                        </p>
+                        <div class="project-images">
+                            <div class="image-grid-compact">
+                                <div class="image-container">
+                                    <img src="project0_assets/part1-1.jpg" alt="Close-up selfie showing perspective distortion">
+                                </div>
+                                <div class="image-container">
+                                    <img src="project0_assets/part1-2.jpg" alt="Distant portrait with zoom showing natural proportions">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Part 2: Architectural Perspective -->
+                    <div class="project-section">
+                        <h3>Part 2: Architectural Perspective Compression</h3>
+                        <p class="section-description">
+                            Demonstrating perspective compression by photographing urban scenes with telephoto zoom from far away versus wide-angle shots from close up, showing how focal length affects depth perception.
+                        </p>
+                        <div class="project-images">
+                            <div class="image-grid-compact">
+                                <div class="image-container">
+                                    <img src="project0_assets/part2-1.JPG" alt="Telephoto compressed perspective of street scene">
+                                </div>
+                                <div class="image-container">
+                                    <img src="project0_assets/part2-2.JPG" alt="Wide-angle close perspective showing depth">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Part 3: Dolly Zoom -->
+                    <div class="project-section">
+                        <h3>Part 3: The Dolly Zoom (Vertigo Effect)</h3>
+                        <p class="section-description">
+                            Creating the classic "Vertigo shot" by simultaneously moving the camera backward while zooming in, maintaining subject size while dramatically changing background perspective and creating a disorienting visual effect.
+                        </p>
+                        <div class="project-images">
+                            <div class="gif-container">
+                                <img src="project0_assets/part3.gif" alt="Dolly zoom effect showing background perspective change">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="project1" class="tab-content">
+            </div>
+
+            <div id="project2" class="tab-content">
+            </div>
+
+            <div id="project3" class="tab-content">
+            </div>
+
+            <div id="project4" class="tab-content">
+            </div>
+
+            <div id="project5" class="tab-content">
+            </div>
+        </main>
+
+        <footer>
+            <p>&copy; 2024 CS180 Portfolio</p>
+        </footer>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
