@@ -499,3 +499,20 @@ footer p {
         gap: 28px;
     }
 }
+
+/* Project 1 layout hardening for GitHub Pages */
+@media (min-width: 768px) {
+    #project1 .project-images .image-grid {
+        grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+    }
+}
+
+#project1 .image-container img {
+    width: 100% !important;
+}
+
+#project1 .project-section .image-container img.wide-img {
+    width: 100% !important;
+    max-width: 100% !important;
+    height: auto;
+}
