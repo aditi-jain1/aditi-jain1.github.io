@@ -480,3 +480,22 @@ footer p {
         max-width: 100%;
     }
 }
+
+.wide-img {
+    width: 100%;
+    height: auto;
+}
+
+#project1 .image-grid {
+    grid-template-columns: repeat(3, 1fr);
+}
+
+#project1 .image-container img {
+    width: 100%;
+}
+
+@media (min-width: 1024px) {
+    #project1 .image-grid {
+        gap: 28px;
+    }
+}

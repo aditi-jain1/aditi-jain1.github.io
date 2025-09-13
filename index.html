@@ -14,8 +14,8 @@
         </header>
 
         <nav class="tab-navigation">
-            <button class="tab-button active" data-tab="project0">Project 0</button>
-            <button class="tab-button" data-tab="project1">Project 1</button>
+            <button class="tab-button" data-tab="project0">Project 0</button>
+            <button class="tab-button active" data-tab="project1">Project 1</button>
             <button class="tab-button" data-tab="project2">Project 2</button>
             <button class="tab-button" data-tab="project3">Project 3</button>
             <button class="tab-button" data-tab="project4">Project 4</button>
@@ -23,7 +23,7 @@
         </nav>
 
         <main class="content">
-            <div id="project0" class="tab-content active">
+            <div id="project0" class="tab-content">
                 <h2>Project 0: Becoming Friends with Your Camera</h2>
                 <div class="project-info">
                     <!-- Part 1: Selfie Comparison -->
@@ -77,7 +77,115 @@
                 </div>
             </div>
 
-            <div id="project1" class="tab-content">
+            <div id="project1" class="tab-content active">
+                <h2>Project 1: Colorizing the Prokudin-Gorskii Photo Collection</h2>
+                <div class="project-info">
+                    <div class="project-section">
+                        <h3>Process Overview</h3>
+                        <p class="section-description">High-level pipeline from BGR plates to aligned RGB output.</p>
+                        <div class="project-images">
+                            <div class="image-container">
+                                <img class="wide-img" src="project1_assets/process.jpeg" alt="Alignment pipeline and thought process">
+                                <div class="image-caption">Alignment pipeline and design choices</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="project-section">
+                        <h3>Single-Scale Alignment</h3>
+                        <p class="section-description">Exhaustive search on small windows; aligned directly at a single scale.</p>
+                        <p>For single-scale alignment, I first cropped the images to reduce the influence of noisy borders, which often caused incorrect error or correlation values. I found that I could crop away as much as 30% of the image and still achieve good alignment. I then searched over an offset range of [-15, 15] for both the x and y directions, recording the offset that minimized error (or maximized correlation) between channels. Repeating this process for the red and green channels relative to the blue channel, I then stacked the aligned results to produce the final color image.</p>
+                        <div class="project-images">
+                            <div class="image-grid">
+                                <div class="image-container">
+                                    <img class="wide-img" src="project1_assets/aligned_images/tobolsk.png" alt="tobolsk aligned color image">
+                                    <div class="image-caption">tobolsk — G Offset: (3, 3) | R Offset: (7, 3)</div>
+                                </div>
+                                <div class="image-container">
+                                    <img class="wide-img" src="project1_assets/aligned_images/cathedral.png" alt="cathedral aligned color image">
+                                    <div class="image-caption">cathedral — G Offset: (5, 2) | R Offset: (12, 3)</div>
+                                </div>
+                                <div class="image-container">
+                                    <img class="wide-img" src="project1_assets/aligned_images/monastery.png" alt="monastery aligned color image">
+                                    <div class="image-caption">monastery — G Offset: (-3, 2) | R Offset: (3, 2)</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="project-section">
+                        <h3>Pyramid (Coarse-to-Fine) Alignment</h3>
+                        <p class="section-description">Multi-scale search to efficiently handle large displacements on high-resolution scans.</p>
+                        <p>However, for larger images this single-scale approach became computationally inefficient, since the true misalignment could span tens or even hundreds of pixels. To address this, I implemented a pyramid alignment strategy. The idea was to first downsample the images and compute the best offset at this coarser scale, where each pixel represented a larger portion of the image. I then used this offset as the center for a smaller search window at the next higher resolution. By iteratively repeating this process through increasingly finer scales, I was able to efficiently “zoom in” on the correct offsets for alignment.</p>
+                        <p>One limitation I encountered was with the Emir image, where I was unable to achieve perfect alignment across all channels. While the blue and green channels aligned well, the red channel consistently lagged behind. The main reason for this is that the red channel has a noticeably different brightness scale compared to the other two channels, making pixel intensity–based comparisons (such as L2 error or cross-correlation) less reliable.</p>
+                        <p>A possible improvement would be to normalize each channel’s intensity values before alignment. For example, rescaling so that the darkest pixel maps to 0 and the brightest pixel maps to 255 (or 1.0 in floating-point representation) would ensure that all channels are compared on the same scale. This normalization step would reduce the impact of brightness differences and make correlation-based alignment more robust.</p>
+                        <p>To further improve both speed and accuracy, I introduced a tiered search window strategy. At lower resolutions (coarser pyramid levels), I used a larger search window since the potential misalignments were bigger. As I moved up to higher-resolution images, I gradually decreased the search window size, which significantly reduced computation time while still refining the alignment.</p>
+                        <p>I also experimented with changing the reference channel. While I primarily aligned the red and green channels to blue, I found that in some cases aligning to the green channel produced better correlation scores and visually improved results. This suggests that the choice of reference channel can matter depending on the image, especially when one channel has brightness or contrast differences (as with the Emir image).</p>
+                        <div class="project-images">
+                            <div class="image-grid">
+                                <div class="image-container">
+                                    <img class="wide-img" src="project1_assets/aligned_images/church.png" alt="church aligned color image">
+                                    <div class="image-caption">church — G Offset: (25, 4) | R Offset: (58, -4)</div>
+                                </div>
+                                <div class="image-container">
+                                    <img class="wide-img" src="project1_assets/aligned_images/emir.png" alt="emir aligned color image">
+                                    <div class="image-caption">emir — G Offset: (49, 24) | R Offset: (90, -475)</div>
+                                </div>
+                                <div class="image-container">
+                                    <img class="wide-img" src="project1_assets/aligned_images/harvesters.png" alt="harvesters aligned color image">
+                                    <div class="image-caption">harvesters — G Offset: (59, 16) | R Offset: (123, 13)</div>
+                                </div>
+                                <div class="image-container">
+                                    <img class="wide-img" src="project1_assets/aligned_images/icon.png" alt="icon aligned color image">
+                                    <div class="image-caption">icon — G Offset: (41, 17) | R Offset: (89, 23)</div>
+                                </div>
+                                <div class="image-container">
+                                    <img class="wide-img" src="project1_assets/aligned_images/italil.png" alt="italil aligned color image">
+                                    <div class="image-caption">italil — G Offset: (38, 21) | R Offset: (76, 35)</div>
+                                </div>
+                                <div class="image-container">
+                                    <img class="wide-img" src="project1_assets/aligned_images/lastochikino.png" alt="lastochikino aligned color image">
+                                    <div class="image-caption">lastochikino — G Offset: (-2, -2) | R Offset: (75, -8)</div>
+                                </div>
+                                <div class="image-container">
+                                    <img class="wide-img" src="project1_assets/aligned_images/lugano.png" alt="lugano aligned color image">
+                                    <div class="image-caption">lugano — G Offset: (41, -16) | R Offset: (92, -29)</div>
+                                </div>
+                                <div class="image-container">
+                                    <img class="wide-img" src="project1_assets/aligned_images/melons.png" alt="melons aligned color image">
+                                    <div class="image-caption">melons — G Offset: (81, 10) | R Offset: (178, 13)</div>
+                                </div>
+                                <div class="image-container">
+                                    <img class="wide-img" src="project1_assets/aligned_images/self_portrait.png" alt="self_portrait aligned color image">
+                                    <div class="image-caption">self_portrait — G Offset: (78, 29) | R Offset: (176, 37)</div>
+                                </div>
+                                <div class="image-container">
+                                    <img class="wide-img" src="project1_assets/aligned_images/siren.png" alt="siren aligned color image">
+                                    <div class="image-caption">siren — G Offset: (49, -6) | R Offset: (96, -24)</div>
+                                </div>
+                                <div class="image-container">
+                                    <img class="wide-img" src="project1_assets/aligned_images/three_generations.png" alt="three_generations aligned color image">
+                                    <div class="image-caption">three_generations — G Offset: (53, 14) | R Offset: (111, 11)</div>
+                                </div>
+                            </div>
+                            <p class="section-description" style="margin-top: 20px;">My Images</p>
+                            <div class="image-grid">
+                                <div class="image-container">
+                                    <img class="wide-img" src="project1_assets/aligned_images/my_Im1.png" alt="my_Im1 aligned color image">
+                                    <div class="image-caption">my_Im1 — G Offset: (56, 14) | R Offset: (116, 13)</div>
+                                </div>
+                                <div class="image-container">
+                                    <img class="wide-img" src="project1_assets/aligned_images/my_im2.png" alt="my_im2 aligned color image">
+                                    <div class="image-caption">my_im2 — G Offset: (9, 19) | R Offset: (35, 38)</div>
+                                </div>
+                                <div class="image-container">
+                                    <img class="wide-img" src="project1_assets/aligned_images/my_im3.png" alt="my_im3 aligned color image">
+                                    <div class="image-caption">my_im3 — G Offset: (23, 20) | R Offset: (58, 25)</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
 
             <div id="project2" class="tab-content">
