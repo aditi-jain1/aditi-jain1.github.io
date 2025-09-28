@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>CS180 Portfolio</title>
     <link rel="stylesheet" href="styles.css?v=20250913">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/base16/atelier-cave-dark.min.css">
 </head>
 <body>
     <div class="container">
@@ -189,6 +190,311 @@
             </div>
 
             <div id="project2" class="tab-content">
+                <h2>Project 2: Fun with Filters and Frequencies!</h2>
+                <div class="project-info">
+                    <div class="project-section">
+                        <h3>Part 1: Fun with Filters</h3>
+                    </div>
+
+                    <div class="project-section">
+                        <h3>Part 1.1: Convolutions from Scratch!</h3>
+                        <p>I implemented convolution first with four loops, then with two loops using array slicing. Compared with scipy.signal.convolve2d, my version produced identical results but ran more slowly due to Python loop overhead. Zero padding ensured the output size matched the input, while built-in functions offered more flexible boundary modes.</p>
+                        <div class="project-images">
+                            <div class="image-grid image-grid-4">
+                                <div class="image-container">
+                                    <img class="wide-img" src="project2_assets/part_1_original.jpg" alt="Part 1 original image">
+                                    <div class="image-caption">Original grayscale input</div>
+                                </div>
+                                <div class="image-container">
+                                    <img class="wide-img" src="project2_assets/part_1_box_convolved.png" alt="Part 1 box convolved result">
+                                    <div class="image-caption">Box filter (9x9) blur</div>
+                                </div>
+                                <div class="image-container">
+                                    <img class="wide-img" src="project2_assets/part_1_dx.png" alt="Finite difference Dx result">
+                                    <div class="image-caption">Finite difference D_x</div>
+                                </div>
+                                <div class="image-container">
+                                    <img class="wide-img" src="project2_assets/part_1_dy.png" alt="Finite difference Dy result">
+                                    <div class="image-caption">Finite difference D_y</div>
+                                </div>
+                            </div>
+                        </div>
+                        <pre class="code-block"><code class="language-python">img = cv2.imread('part_1_original.jpg', cv2.IMREAD_GRAYSCALE)
+box_filter = np.ones((9, 9)) / 81
+dx_filter = np.array([[1, 0, -1]])
+dy_filter = dx_filter.T
+
+def conv_4loops(img, kernel):
+    padded = np.pad(img, ((kernel.shape[0]//2, kernel.shape[0]//2), (kernel.shape[1]//2, kernel.shape[1]//2)), mode='constant', constant_values=0)
+    conv_img = np.zeros_like(img)
+    for i in range(img.shape[0]):
+        for j in range(img.shape[1]):
+            dot_product = 0
+            for h in range(kernel.shape[0]):
+                for w in range(kernel.shape[1]):
+                    dot_product += padded[i+h, j+w] * kernel[h, w]
+            conv_img[i, j] = dot_product
+    return conv_img
+
+def conv_2loops(img, kernel):
+    padded = np.pad(img, ((kernel.shape[0]//2, kernel.shape[0]//2), (kernel.shape[1]//2, kernel.shape[1]//2)), mode='constant', constant_values=0)
+    conv_img = np.zeros_like(img)
+    for i in range(img.shape[0]):
+        for j in range(img.shape[1]):
+            conv_img[i, j] = np.sum(padded[i:i+kernel.shape[0], j:j+kernel.shape[1]] * kernel)
+    return conv_img
+
+conv_img_4loops = conv_4loops(img, box_filter)
+conv_img_2loops = conv_2loops(img, box_filter)
+conv_img_dx_4loops = conv_4loops(img, dx_filter)
+conv_img_dy_4loops = conv_4loops(img, dy_filter)
+conv_img_dx_2loops = conv_2loops(img, dx_filter)
+conv_img_dy_2loops = conv_2loops(img, dy_filter)
+conv_img_scipy = scipy.signal.convolve2d(img, box_filter, mode='same')
+conv_img_dx_scipy = scipy.signal.convolve2d(img, dx_filter, mode='same')
+conv_img_dy_scipy = scipy.signal.convolve2d(img, dy_filter, mode='same')</code></pre>
+                    </div>
+
+                    <div class="project-section">
+                        <h3>Part 1.2: Finite Difference Operator</h3>
+                        <p>Convolving with D_x and D_y revealed vertical and horizontal edges in the image. The gradient magnitude combined these into a strong edge response, while binarization with a tuned threshold removed noise. The chosen threshold balanced capturing fine edges while avoiding spurious noise responses.</p>
+                        <div class="project-images">
+                            <div class="image-grid image-grid-4">
+                                <div class="image-container">
+                                    <img class="wide-img" src="project2_assets/camera_1_2_dx.png" alt="Cameraman Dx">
+                                    <div class="image-caption">Cameraman D_x</div>
+                                </div>
+                                <div class="image-container">
+                                    <img class="wide-img" src="project2_assets/camera_1_2_dy.png" alt="Cameraman Dy">
+                                    <div class="image-caption">Cameraman D_y</div>
+                                </div>
+                                <div class="image-container">
+                                    <img class="wide-img" src="project2_assets/camera_1_2_mag.png" alt="Cameraman gradient magnitude">
+                                    <div class="image-caption">Gradient magnitude</div>
+                                </div>
+                                <div class="image-container">
+                                    <img class="wide-img" src="project2_assets/camera_1_2_edges.png" alt="Cameraman edges binary">
+                                    <div class="image-caption">Binarized edges</div>
+                                </div>
+                            </div>
+                        </div>
+                        <pre class="code-block"><code class="language-python">img = cv2.imread('cameraman.png', cv2.IMREAD_GRAYSCALE)
+dx_filter = np.array([[1, 0, -1]]).reshape((1, 3))
+dy_filter = dx_filter.T.reshape((3, 1))
+
+camera_dx = scipy.signal.convolve2d(img, dx_filter, mode='same')
+camera_dy = scipy.signal.convolve2d(img, dy_filter, mode='same')
+gradient_magnitude = np.sqrt(camera_dx**2 + camera_dy**2)
+
+threshold = 70
+camera_edges = (gradient_magnitude > threshold).astype(np.uint8) * 255</code></pre>
+                    </div>
+
+                    <div class="project-section">
+                        <h3>Part 1.3: Derivative of Gaussian (DoG) Filter</h3>
+                        <p>Applying a Gaussian before the finite differences reduced noise and produced smoother edge maps. Constructing DoG filters directly gave nearly identical results, verifying the equivalence of the two approaches. The DoG edges were cleaner and more continuous compared to plain finite differences.</p>
+                        <div class="project-images">
+                            <div class="image-container">
+                                <img class="wide-img" src="project2_assets/part_1_3_dog_filters.png" alt="DoG filters visualization">
+                                <div class="image-caption">DoG filters - showing the constructed derivative of Gaussian filters</div>
+                            </div>
+                            <div class="image-grid image-grid-4" style="margin-top: 20px;">
+                                <div class="image-container">
+                                    <img class="wide-img" src="project2_assets/camera_1_3_dx.png" alt="Cameraman DoG Dx">
+                                    <div class="image-caption">DoG D_x</div>
+                                </div>
+                                <div class="image-container">
+                                    <img class="wide-img" src="project2_assets/camera_1_3_dy.png" alt="Cameraman DoG Dy">
+                                    <div class="image-caption">DoG D_y</div>
+                                </div>
+                                <div class="image-container">
+                                    <img class="wide-img" src="project2_assets/camera_1_3_mag.png" alt="Cameraman DoG magnitude">
+                                    <div class="image-caption">DoG magnitude</div>
+                                </div>
+                                <div class="image-container">
+                                    <img class="wide-img" src="project2_assets/camera_1_3_edges.png" alt="Cameraman DoG edges">
+                                    <div class="image-caption">DoG edges</div>
+                                </div>
+                            </div>
+                        </div>
+                        <pre class="code-block"><code class="language-python">img = cv2.imread('cameraman.png', cv2.IMREAD_GRAYSCALE)
+dx_filter = np.array([[1, 0, -1]]).reshape((1, 3))
+dy_filter = dx_filter.T.reshape((3, 1))
+
+# lets blur the image first
+gaussian_kernel = cv2.getGaussianKernel(ksize=9, sigma=2)
+gaussian_kernel = gaussian_kernel * gaussian_kernel.T
+blurred = scipy.signal.convolve2d(img, gaussian_kernel, mode='same')
+
+camera_dx = scipy.signal.convolve2d(blurred, dx_filter, mode='same')
+camera_dy = scipy.signal.convolve2d(blurred, dy_filter, mode='same')
+gradient_magnitude = np.sqrt(camera_dx**2 + camera_dy**2)
+
+threshold = 25
+camera_edges = (gradient_magnitude > threshold).astype(np.uint8) * 255</code></pre>
+                    </div>
+
+                    <div class="project-section">
+                        <h3>Part 2: Fun with Frequencies!</h3>
+                    </div>
+
+                    <div class="project-section">
+                        <h3>Part 2.1: Image "Sharpening"</h3>
+                        <p>Unsharp masking adds back high-frequency detail by subtracting a Gaussian blur from the original and amplifying the residual. Sharpening the Taj Mahal emphasized edges and textures, while over-sharpening introduced halos. On artificially blurred images, sharpening restored detail but could not fully recover the lost crispness of the original.</p>
+                        <div class="project-images">
+                            <div class="image-grid image-grid-2">
+                                <div class="image-container">
+                                    <img class="wide-img" src="project2_assets/part_2_1_taj.png" alt="Taj original">
+                                    <div class="image-caption">Taj original</div>
+                                </div>
+                                <div class="image-container">
+                                    <img class="wide-img" src="project2_assets/part_2_1_taj_sharp.png" alt="Taj sharpened">
+                                    <div class="image-caption">Taj sharpened</div>
+                                </div>
+                            </div>
+                            <div class="image-grid image-grid-4" style="margin-top: 10px;">
+                                <div class="image-container">
+                                    <img class="wide-img" src="project2_assets/part_2_1_girl.png" alt="Girl original">
+                                    <div class="image-caption">Girl original</div>
+                                </div>
+                                <div class="image-container">
+                                    <img class="wide-img" src="project2_assets/part_2_1_girl_sharp.png" alt="Girl sharpened">
+                                    <div class="image-caption">Girl sharpened</div>
+                                </div>
+                                <div class="image-container">
+                                    <img class="wide-img" src="project2_assets/part_2_1_boy.png" alt="Boy original">
+                                    <div class="image-caption">Boy original</div>
+                                </div>
+                                <div class="image-container">
+                                    <img class="wide-img" src="project2_assets/part_2_1_boy_sharp.png" alt="Boy sharpened">
+                                    <div class="image-caption">Boy sharpened</div>
+                                </div>
+                            </div>
+                            <div class="image-grid image-grid-3" style="margin-top: 14px;">
+                                <div class="image-container">
+                                    <img class="wide-img" src="project2_assets/part_2_1_evaluate_orig.png" alt="Eval original sharp image">
+                                    <div class="image-caption">Eval: original sharp</div>
+                                </div>
+                                <div class="image-container">
+                                    <img class="wide-img" src="project2_assets/part_2_1_evaluate_blurry.png" alt="Eval blurred">
+                                    <div class="image-caption">Eval: blurred</div>
+                                </div>
+                                <div class="image-container">
+                                    <img class="wide-img" src="project2_assets/part_2_1_evaluate_sharp.png" alt="Eval sharpened">
+                                    <div class="image-caption">Eval: sharpened</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="project-section">
+                        <h3>Part 2.2: Hybrid Images</h3>
+                        <p>I created hybrid images by low-passing one image and high-passing another, then combining them. Up close, the high frequencies dominate perception, while from a distance the low frequencies define the interpretation. Fourier analysis confirmed the frequency separation, and I found that choosing good cutoff frequencies was crucial for a clear effect.</p>
+                        <div class="project-images">
+                            <div class="image-grid image-grid-4">
+                                <div class="image-container">
+                                    <img class="wide-img" src="project2_assets/part_2_2_fft_face.png" alt="FFT face (low-pass)">
+                                    <div class="image-caption">FFT: input A (low)</div>
+                                </div>
+                                <div class="image-container">
+                                    <img class="wide-img" src="project2_assets/part_2_2_fft_dog.png" alt="FFT dog (high-pass)">
+                                    <div class="image-caption">FFT: input B (high)</div>
+                                </div>
+                                <div class="image-container">
+                                    <img class="wide-img" src="project2_assets/part_2_2_fft_low.png" alt="FFT low-pass result">
+                                    <div class="image-caption">FFT: low-pass</div>
+                                </div>
+                                <div class="image-container">
+                                    <img class="wide-img" src="project2_assets/part_2_2_fft_high.png" alt="FFT high-pass result">
+                                    <div class="image-caption">FFT: high-pass</div>
+                                </div>
+                            </div>
+                            <div class="image-grid image-grid-4">
+                                <div class="image-container">
+                                    <img class="wide-img" src="project2_assets/my_face.png" alt="Morph1 image A (my_face)">
+                                    <div class="image-caption">Morph1: my_face</div>
+                                </div>
+                                <div class="image-container">
+                                    <img class="wide-img" src="project2_assets/tiger.png" alt="Morph1 image B (tiger)">
+                                    <div class="image-caption">Morph1: tiger</div>
+                                </div>
+                                <div class="image-container">
+                                    <img class="wide-img" src="project2_assets/face_morph1.png" alt="Morph1 hybrid result">
+                                    <div class="image-caption">Morph1: hybrid result</div>
+                                </div>
+                            </div>
+
+                            <div class="image-grid image-grid-4" style="margin-top: 10px;">
+                                <div class="image-container">
+                                    <img class="wide-img" src="project2_assets/adi.png" alt="Morph2 image A (adi)">
+                                    <div class="image-caption">Morph2: adi</div>
+                                </div>
+                                <div class="image-container">
+                                    <img class="wide-img" src="project2_assets/dog.png" alt="Morph2 image B (dog)">
+                                    <div class="image-caption">Morph2: dog</div>
+                                </div>
+                                <div class="image-container">
+                                    <img class="wide-img" src="project2_assets/face_morph2.png" alt="Morph2 hybrid result">
+                                    <div class="image-caption">Morph2: hybrid result</div>
+                                </div>
+                            </div>
+
+                            <div class="image-grid image-grid-4" style="margin-top: 10px;">
+                                <div class="image-container">
+                                    <img class="wide-img" src="project2_assets/derek.png" alt="Morph3 image A (derek)">
+                                    <div class="image-caption">Morph3: derek</div>
+                                </div>
+                                <div class="image-container">
+                                    <img class="wide-img" src="project2_assets/cat.png" alt="Morph3 image B (cat)">
+                                    <div class="image-caption">Morph3: cat</div>
+                                </div>
+                                <div class="image-container">
+                                    <img class="wide-img" src="project2_assets/face_morph3.png" alt="Morph3 hybrid result">
+                                    <div class="image-caption">Morph3: hybrid result</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="project-section">
+                        <h3>Part 2.3: Gaussian and Laplacian Stacks</h3>
+                        <p>Gaussian stacks progressively smoothed the images, while Laplacian stacks isolated different frequency bands. Visualizing these stacks for the apple and orange confirmed the separation of detail across scales. The stacks made it possible to reconstruct the image and later perform multi-resolution blending.</p>
+                        <div class="project-images">
+                            <div class="image-container">
+                                <img class="wide-img" src="project2_assets/part_2_3.png" alt="Gaussian and Laplacian stacks visualization">
+                                <div class="image-caption">Gaussian and Laplacian stacks for the apple and orange, recreating Figure 3.42 from Szelski</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="project-section">
+                        <h3>Part 2.4: Multiresolution Blending (a.k.a. the oraple!)</h3>
+                        <p>By applying Gaussian and Laplacian stacks with a smooth mask, I blended two images seamlessly. The blurred mask avoided sharp seams, creating smooth transitions across frequency bands. With irregular masks, I produced creative blends like merging objects into new hybrids.</p>
+                        <div class="project-images">
+                            <div class="image-container">
+                                <img class="wide-img" src="project2_assets/part_2_4_oraple.png" alt="Classic oraple - apple orange blend">
+                                <div class="image-caption">The classic "oraple" - blending apple and orange with a vertical seam</div>
+                            </div>
+                            
+                            <div class="image-grid image-grid-3" style="margin-top: 20px;">
+                                <div class="image-container">
+                                    <img class="wide-img" src="project2_assets/part_2_4_pikabob_square_mask.png" alt="Pikachu Spongebob blend with square mask">
+                                    <div class="image-caption">Pikachu + SpongeBob with square mask</div>
+                                </div>
+                                <div class="image-container">
+                                    <img class="wide-img" src="project2_assets/part_2_4_tigerface_vertical_mask.png" alt="Tiger face blend with vertical mask">
+                                    <div class="image-caption">Tiger + Face with vertical mask</div>
+                                </div>
+                                <div class="image-container">
+                                    <img class="wide-img" src="project2_assets/part_2_4_tigerface_gradient_mask.png" alt="Tiger face blend with gradient mask">
+                                    <div class="image-caption">Tiger + Face with gradient mask</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    
+                </div>
             </div>
 
             <div id="project3" class="tab-content">
@@ -206,6 +512,8 @@
         </footer>
     </div>
 
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+    <script>window.addEventListener('DOMContentLoaded',()=>{ document.querySelectorAll('pre.code-block code').forEach((el)=>{ try{ hljs.highlightElement(el);}catch(e){} });});</script>
     <script src="script.js"></script>
 </body>
 </html>

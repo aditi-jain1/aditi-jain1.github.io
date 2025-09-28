@@ -208,6 +208,18 @@ header h1 {
     margin-bottom: 20px;
 }
 
+.image-grid-4 {
+    grid-template-columns: repeat(4, 1fr);
+}
+
+.image-grid-3 {
+    grid-template-columns: repeat(3, 1fr);
+}
+
+.image-grid-2 {
+    grid-template-columns: repeat(2, 1fr);
+}
+
 .image-container {
     text-align: center;
 }
@@ -516,3 +528,121 @@ footer p {
     max-width: 100% !important;
     height: auto;
 }
+
+/* Project 2 Part 1.1: larger images, minimal gaps */
+#project2 .image-grid.image-grid-4 {
+    gap: 10px;
+}
+#project2 .image-grid.image-grid-4 .image-container img {
+    width: 100%;
+}
+#project2 .image-grid.image-grid-4 .image-caption {
+    font-size: 0.85rem;
+}
+
+/* Project 2 Part 2.1: tighten 2-col (Taj) and enlarge 3-col (eye) */
+#project2 .image-grid.image-grid-2 {
+    gap: 10px;
+}
+#project2 .image-grid.image-grid-2 .image-container img {
+    width: 100%;
+}
+#project2 .image-grid.image-grid-3 {
+    gap: 10px;
+}
+#project2 .image-grid.image-grid-3 .image-container img {
+    width: 100%;
+}
+
+/* Scrollable code block with Midnight Owl theme */
+.code-block {
+    background: #011627;
+    color: #d6deeb;
+    border-radius: 12px;
+    border: 1px solid rgba(214, 222, 235, 0.15);
+    padding: 16px;
+    overflow: auto;
+    max-height: 360px;
+    box-shadow: 0 8px 24px rgba(1, 22, 39, 0.5);
+}
+
+.code-block code {
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+    font-size: 0.9rem;
+    line-height: 1.6;
+    white-space: pre;
+}
+
+/* Subtle scrollbar styling */
+.code-block::-webkit-scrollbar {
+    height: 10px;
+    width: 10px;
+}
+.code-block::-webkit-scrollbar-thumb {
+    background: rgba(214, 222, 235, 0.25);
+    border-radius: 8px;
+}
+.code-block::-webkit-scrollbar-track {
+    background: rgba(1, 22, 39, 0.6);
+}
+
+/* Simple syntax highlight accents */
+.code-block .kw { color: #c792ea; }     /* keywords */
+.code-block .fn { color: #82aaff; }     /* functions */
+.code-block .cm { color: #637777; }     /* comments */
+.code-block .st { color: #ecc48d; }     /* strings */
+.code-block .nu { color: #f78c6c; }     /* numbers */
+
+/* Highlight.js Midnight Owl-like token colors scoped to .code-block */
+.code-block .hljs { color: #d6deeb; background: transparent; }
+.code-block .hljs-keyword, .code-block .hljs-selector-tag { color: #c792ea; }
+.code-block .hljs-string, .code-block .hljs-attr, .code-block .hljs-template-tag { color: #ecc48d; }
+.code-block .hljs-number, .code-block .hljs-literal { color: #f78c6c; }
+.code-block .hljs-comment, .code-block .hljs-quote { color: #637777; font-style: italic; }
+.code-block .hljs-title, .code-block .hljs-section, .code-block .hljs-function { color: #82aaff; }
+.code-block .hljs-attribute, .code-block .hljs-variable, .code-block .hljs-template-variable { color: #7fdbca; }
+.code-block .hljs-built_in, .code-block .hljs-builtin-name, .code-block .hljs-class .hljs-title { color: #addb67; }
+.code-block .hljs-meta { color: #d6deeb; }
+.code-block .hljs-operator { color: #c792ea; }
+.code-block code { tab-size: 4; }
+
+/* Morph carousel */
+.morph-carousel {
+    position: relative;
+    overflow: hidden;
+    background: rgba(255, 255, 255, 0.6);
+    border: 1px solid rgba(102, 126, 234, 0.12);
+    border-radius: 14px;
+    padding: 14px 44px; /* space for arrows */
+    margin-bottom: 12px;
+}
+.morph-carousel .carousel-track {
+    display: flex;
+    transition: transform 0.35s ease;
+}
+.morph-carousel .carousel-slide {
+    min-width: 100%;
+}
+.morph-carousel .carousel-slide:not(.active) {
+    display: none;
+}
+.carousel-btn {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    background: rgba(1, 22, 39, 0.6);
+    color: #d6deeb;
+    border: none;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 22px;
+    box-shadow: 0 4px 12px rgba(1, 22, 39, 0.35);
+}
+.carousel-btn:hover { background: rgba(1, 22, 39, 0.8); }
+.carousel-btn.prev { left: 10px; }
+.carousel-btn.next { right: 10px; }

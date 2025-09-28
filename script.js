@@ -66,4 +66,36 @@ document.addEventListener('DOMContentLoaded', function() {
             setTimeout(smoothScrollToTop, 100);
         });
     });
+
+    // Morph carousel logic
+    document.querySelectorAll('[data-carousel]').forEach(carousel => {
+        const slides = Array.from(carousel.querySelectorAll('.carousel-slide'));
+        const prev = carousel.querySelector('[data-carousel-prev]');
+        const next = carousel.querySelector('[data-carousel-next]');
+        let index = slides.findIndex(s => s.classList.contains('active'));
+        if (index < 0) index = 0;
+
+        function show(i) {
+            slides.forEach((s, idx) => {
+                if (idx === i) {
+                    s.classList.add('active');
+                    s.style.display = '';
+                } else {
+                    s.classList.remove('active');
+                    s.style.display = 'none';
+                }
+            });
+        }
+
+        prev && prev.addEventListener('click', () => {
+            index = (index - 1 + slides.length) % slides.length;
+            show(index);
+        });
+        next && next.addEventListener('click', () => {
+            index = (index + 1) % slides.length;
+            show(index);
+        });
+
+        show(index);
+    });
 });
