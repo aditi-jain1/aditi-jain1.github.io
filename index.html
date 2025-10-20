@@ -498,6 +498,264 @@ camera_edges = (gradient_magnitude > threshold).astype(np.uint8) * 255</code></p
             </div>
 
             <div id="project3" class="tab-content">
+                <h2>Project 3: Face Morphing and Modelling a Photo Collection</h2>
+                <div class="project-info">
+                    <div class="project-section">
+                        <h3>Project 3A: Image Mosaicing and Homographies</h3>
+                    </div>
+
+                    <div class="project-section">
+                        <h3>Part A.1: Shoot the Pictures</h3>
+                        <p>I captured multiple sets of images with fixed center of projection, rotating the camera to create projective transformations between them. Each set has 40-70% overlap for effective registration.</p>
+                        <div class="project-images">
+                            <div class="image-container">
+                                <img class="wide-img" src="project3a_assets/part1.jpeg" alt="Sample image set">
+                                <div class="image-caption">Sample image pair showing significant overlap</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="project-section">
+                        <h3>Part A.2: Recover Homographies</h3>
+                        <p>I implemented computeH() to recover 3x3 homography matrices from point correspondences using least-squares solution of an overdetermined system. More than 4 correspondences were used for stability.</p>
+                        <div class="project-images">
+                            <div class="image-container">
+                                <img class="wide-img" src="project3a_assets/part2.jpeg" alt="Warping comparison">
+                                <div class="image-caption">Deriving system of equations</div>
+                            </div>
+                            
+                            <div class="image-grid image-grid-2" style="margin-top: 20px;">
+                                <div class="image-container">
+                                    <img class="wide-img" src="project3a_assets/correspondances_mosaic1.jpeg" alt="Correspondences mosaic 1">
+                                    <div class="image-caption">Point correspondences - Mosaic 1</div>
+                                </div>
+                                <div class="image-container">
+                                    <div class="code-section" style="margin: 0; padding: 15px;">
+                                        <h5>Homography Matrix H₁:</h5>
+                                        <pre style="font-size: 0.8rem; margin: 0; background: #f8f9fa; padding: 10px; border-radius: 4px; overflow-x: auto;"><code>[[ 2.61725609e+00  3.13135381e-01 -5.70333211e+03]
+ [ 3.04043776e-01  2.23924757e+00 -1.03677591e+03]
+ [ 3.78162260e-04  4.70556190e-05  1.00000000e+00]]</code></pre>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="image-grid image-grid-2" style="margin-top: 20px;">
+                                <div class="image-container">
+                                    <img class="wide-img" src="project3a_assets/correspondances_mosaic2.jpeg" alt="Correspondences mosaic 2">
+                                    <div class="image-caption">Point correspondences - Mosaic 2</div>
+                                </div>
+                                <div class="image-container">
+                                    <div class="code-section" style="margin: 0; padding: 15px;">
+                                        <h5>Homography Matrix H₂:</h5>
+                                        <pre style="font-size: 0.8rem; margin: 0; background: #f8f9fa; padding: 10px; border-radius: 4px; overflow-x: auto;"><code>[[ 1.73009220e+00 -2.00144200e-01 -2.21389818e+03]
+ [ 4.62641636e-01  1.41287850e+00 -9.94025414e+02]
+ [ 1.93569379e-04 -3.01906612e-05  1.00000000e+00]]</code></pre>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="image-grid image-grid-2" style="margin-top: 20px;">
+                                <div class="image-container">
+                                    <img class="wide-img" src="project3a_assets/correspondances_mosaic3.jpeg" alt="Correspondences mosaic 3">
+                                    <div class="image-caption">Point correspondences - Mosaic 3</div>
+                                </div>
+                                <div class="image-container">
+                                    <div class="code-section" style="margin: 0; padding: 15px;">
+                                        <h5>Homography Matrix H₃:</h5>
+                                        <pre style="font-size: 0.8rem; margin: 0; background: #f8f9fa; padding: 10px; border-radius: 4px; overflow-x: auto;"><code>[[ 1.28216213e+00  1.43927221e-01  1.24806312e+03]
+ [ 3.50005871e-01  1.36329450e+00 -6.97736104e+02]
+ [ 7.84554293e-05  5.13390249e-05  1.00000000e+00]]</code></pre>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="project-section">
+                        <h3>Part A.3: Warp the Images</h3>
+                        <p>I implemented both nearest neighbor and bilinear interpolation using inverse warping. Bilinear interpolation produces smoother results with less aliasing artifacts compared to nearest neighbor, though at higher computational cost.</p>
+                        <div class="project-images">
+                            <div class="image-container" style="max-width: none;">
+                                <img src="project3a_assets/part3_poster.png" alt="Rectified poster" style="width: 100%; max-width: 800px; height: auto;">
+                                <div class="image-caption">Rectification: Poster made rectangular</div>
+                            </div>
+                            <div class="image-container" style="max-width: none; margin-top: 20px;">
+                                <img src="project3a_assets/part3_ipad.png" alt="Rectified iPad" style="width: 100%; max-width: 800px; height: auto;">
+                                <div class="image-caption">Rectification: iPad screen made rectangular</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="project-section">
+                        <h3>Part A.4: Blend the Images into a Mosaic</h3>
+                        <p>I created seamless mosaics using weighted averaging to reduce edge artifacts. The process involves several key steps:</p>
+                        
+                        <h4>Mosaic Creation Process:</h4>
+                        <div class="code-section">
+                            <h5>1. Image Warping</h5>
+                            <p>Each image is warped into a common coordinate system using the computed homography matrices. This transforms the images so they align properly in the mosaic space.</p>
+                            
+                            <h5>2. Canvas Sizing</h5>
+                            <p>The mosaic canvas is sized to accommodate all warped images, with bounds calculated from the transformed corner points of each image.</p>
+                            
+                            <h5>3. Distance-Based Alpha Masks</h5>
+                            <p>For each image, I create an alpha mask that falls off linearly from the center to the edges. This ensures smooth blending by giving more weight to pixels near the center of each image and less weight to pixels near the edges.</p>
+                            
+                            <h5>4. Weighted Blending</h5>
+                            <p>Images are blended using the formula: <code>final_pixel = Σ(alpha_i × pixel_i) / Σ(alpha_i)</code> where alpha_i is the weight for image i at that pixel location.</p>
+                            
+                            <h5>5. Seamless Integration</h5>
+                            <p>The linear falloff of alpha masks creates smooth transitions between overlapping regions, eliminating harsh seams and creating a natural-looking panorama.</p>
+                        </div>
+                        <div class="project-images">
+                            <div class="image-container" style="max-width: none;">
+                                <img src="project3a_assets/correspondances_mosaic1.jpeg" alt="Correspondences mosaic 1" style="width: 100%; max-width: 900px; height: auto;">
+                                <div class="image-caption">Point correspondences - Mosaic 1</div>
+                            </div>
+                            <div class="image-container" style="max-width: none; margin-top: 20px;">
+                                <img src="project3a_assets/mosaic1.png" alt="Mosaic 1" style="width: 100%; max-width: 900px; height: auto;">
+                                <div class="image-caption">Mosaic 1: Indoor panorama</div>
+                            </div>
+                            
+                            <div class="image-container" style="max-width: none; margin-top: 30px;">
+                                <img src="project3a_assets/correspondances_mosaic2.jpeg" alt="Correspondences mosaic 2" style="width: 100%; max-width: 900px; height: auto;">
+                                <div class="image-caption">Point correspondences - Mosaic 2</div>
+                            </div>
+                            <div class="image-container" style="max-width: none; margin-top: 20px;">
+                                <img src="project3a_assets/mosaic2.png" alt="Mosaic 2" style="width: 100%; max-width: 900px; height: auto;">
+                                <div class="image-caption">Mosaic 2: Outdoor scene</div>
+                            </div>
+                            
+                            <div class="image-container" style="max-width: none; margin-top: 30px;">
+                                <img src="project3a_assets/correspondances_mosaic3.jpeg" alt="Correspondences mosaic 3" style="width: 100%; max-width: 900px; height: auto;">
+                                <div class="image-caption">Point correspondences - Mosaic 3</div>
+                            </div>
+                            <div class="image-container" style="max-width: none; margin-top: 20px;">
+                                <img src="project3a_assets/mosaic3.png" alt="Mosaic 3" style="width: 100%; max-width: 900px; height: auto;">
+                                <div class="image-caption">Mosaic 3: Wide panorama</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="project-section">
+                        <h3>Project 3B: Automatic Image Mosaicing</h3>
+                        <p class="section-description">
+                            Implementation of the Brown et al. paper "Multi-Image Matching using Multi-Scale Oriented Patches" 
+                            for automatic feature detection, matching, and panoramic image stitching using RANSAC.
+                        </p>
+                    </div>
+
+                    <div class="project-section">
+                        <h3>Part B.1: Harris Corner Detection</h3>
+                        <p>
+                            Implemented Harris Interest Point Detector for single-scale corner detection. Applied edge discarding 
+                            to avoid corners near image boundaries. Used peak detection with minimum distance constraints to 
+                            reduce computational load while maintaining good corner distribution.
+                        </p>
+                        <div class="project-images">
+                            <div class="image-container">
+                                <img class="wide-img" src="project3b_assets/part1.png" alt="Harris corner detection results">
+                                <div class="image-caption">Harris corner detection: Before and after Adaptive Non-Maximal Suppression (ANMS)</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="project-section">
+                        <h3>Part B.2: Feature Descriptor Extraction</h3>
+                        <p>
+                            Implemented 8x8 feature descriptors extracted from 40x40 windows with Gaussian blurring for 
+                            smoothness. Applied bias/gain normalization (standardization) to make descriptors robust to 
+                            lighting changes. The larger sampling window provides scale-invariance and better feature 
+                            discrimination.
+                        </p>
+                        <div class="project-images">
+                            <div class="image-grid image-grid-2">
+                                <div class="image-container">
+                                    <img class="wide-img" src="project3b_assets/part2_f1.png" alt="Feature descriptor 1">
+                                </div>
+                                <div class="image-container">
+                                    <img class="wide-img" src="project3b_assets/part2_f2.png" alt="Feature descriptor 2">
+                                </div>
+                            </div>
+                            <div class="image-grid image-grid-2" style="margin-top: 20px;">
+                                <div class="image-container">
+                                    <img class="wide-img" src="project3b_assets/part2_f3.png" alt="Feature descriptor 3">
+                                </div>
+                                <div class="image-container">
+                                    <img class="wide-img" src="project3b_assets/part2_f4.png" alt="Feature descriptor 4">
+                                </div>
+                            </div>
+                            <div class="image-caption" style="text-align: center; margin-top: 10px;">
+                                Sample feature descriptors: 40x40 color patches and their corresponding 8x8 descriptors
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="project-section">
+                        <h3>Part B.3: Feature Matching</h3>
+                        <p>
+                            Implemented Lowe's ratio test for robust feature matching. Used the ratio between first and 
+                            second nearest neighbor distances with a threshold of 0.7 (from Figure 6b of the paper). 
+                            This approach effectively filters out ambiguous matches and improves matching quality.
+                        </p>
+                        <div class="project-images">
+                            <div class="image-container">
+                                <img class="wide-img" src="project3b_assets/part3.png" alt="Feature matching results">
+                                <div class="image-caption">Feature matches between image pairs using Lowe's ratio test</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="project-section">
+                        <h3>Part B.4: RANSAC for Robust Homography</h3>
+                        
+                        <h4>Manual vs Automatic Stitching Comparison</h4>
+                        
+                        <h4>Mosaic 1: Indoor Panorama</h4>
+                        <div class="project-images">
+                            <div class="image-grid image-grid-2" style="margin-top: 20px;">
+                                <div class="image-container">
+                                    <img src="project3a_assets/mosaic1.png" alt="Manual Mosaic 1" style="width: 100%; height: auto;">
+                                    <div class="image-caption">Manual</div>
+                                </div>
+                                <div class="image-container">
+                                    <img src="project3b_assets/part4_mosaic1_auto.png" alt="Automatic Mosaic 1" style="width: 100%; height: auto;">
+                                    <div class="image-caption">Automatic</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <h4>Mosaic 2: Outdoor Scene</h4>
+                        <div class="project-images">
+                            <div class="image-grid image-grid-2" style="margin-top: 30px;">
+                                <div class="image-container">
+                                    <img src="project3a_assets/mosaic2.png" alt="Manual Mosaic 2" style="width: 100%; height: auto;">
+                                    <div class="image-caption">Manual</div>
+                                </div>
+                                <div class="image-container">
+                                    <img src="project3b_assets/part4_mosaic2_auto.png" alt="Automatic Mosaic 2" style="width: 100%; height: auto;">
+                                    <div class="image-caption">Automatic</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <h4>Mosaic 3: Wide Panorama</h4>
+                        <div class="project-images">
+                            <div class="image-grid image-grid-2" style="margin-top: 30px;">
+                                <div class="image-container">
+                                    <img src="project3a_assets/mosaic3.png" alt="Manual Mosaic 3" style="width: 100%; height: auto;">
+                                    <div class="image-caption">Manual</div>
+                                </div>
+                                <div class="image-container">
+                                    <img src="project3b_assets/part4_mosaic3_auto.png" alt="Automatic Mosaic 3" style="width: 100%; height: auto;">
+                                    <div class="image-caption">Automatic</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        
+                    </div>
+                </div>
             </div>
 
             <div id="project4" class="tab-content">
