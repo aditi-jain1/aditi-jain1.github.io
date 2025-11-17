@@ -295,6 +295,355 @@ header h1 {
     transform: translateY(-2px);
 }
 
+/* Project 4 placeholder styles */
+.placeholder-item {
+    background: linear-gradient(135deg, #f0f4f8, #e2e8f0);
+    border: 2px dashed #a0aec0;
+    border-radius: 12px;
+    padding: 40px 20px;
+    text-align: center;
+    color: #4a5568;
+    font-style: italic;
+    margin-bottom: 20px;
+    transition: all 0.3s ease;
+    position: relative;
+    min-height: 150px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.placeholder-item::before {
+    content: '🔄';
+    font-size: 2rem;
+    display: block;
+    margin-bottom: 10px;
+    opacity: 0.6;
+}
+
+.placeholder-item:hover {
+    border-color: #718096;
+    background: linear-gradient(135deg, #e2e8f0, #cbd5e0);
+    transform: translateY(-1px);
+}
+
+.placeholder-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+    margin-bottom: 30px;
+}
+
+.placeholder-grid-2x2 {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: 1fr 1fr;
+    gap: 15px;
+    margin-bottom: 30px;
+}
+
+/* Training progression grid for Part 1 */
+.training-progression-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+    margin-bottom: 40px;
+}
+
+.training-progression-grid .image-container {
+    max-width: none;
+}
+
+.training-progression-grid .image-container img {
+    width: 100%;
+    height: auto;
+    min-height: 200px;
+    object-fit: contain;
+}
+
+.hyperparameter-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: 1fr 1fr;
+    gap: 25px;
+    margin-bottom: 40px;
+}
+
+.hyperparameter-grid .image-container {
+    max-width: none;
+}
+
+.hyperparameter-grid .image-container img {
+    width: 100%;
+    height: auto;
+    min-height: 250px;
+    object-fit: contain;
+}
+
+@media (max-width: 768px) {
+    .placeholder-grid,
+    .placeholder-grid-2x2,
+    .training-progression-grid,
+    .hyperparameter-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .training-progression-grid .image-container img {
+        min-height: 250px;
+    }
+    
+    .hyperparameter-grid .image-container img {
+        min-height: 300px;
+    }
+}
+
+/* NeRF-specific grids for Part 2 */
+.nerf-visualization-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 25px;
+    margin-bottom: 40px;
+}
+
+.nerf-visualization-grid .image-container img {
+    width: 100%;
+    height: auto;
+    min-height: 300px;
+    object-fit: contain;
+}
+
+.nerf-training-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 20px;
+    margin-bottom: 40px;
+}
+
+.nerf-training-grid .image-container img {
+    width: 100%;
+    height: auto;
+    min-height: 180px;
+    object-fit: contain;
+}
+
+/* Video containers */
+.video-container {
+    margin-bottom: 30px;
+    text-align: center;
+}
+
+.video-container video {
+    width: 100%;
+    max-width: 600px;
+    height: auto;
+    border-radius: 12px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+}
+
+.video-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 30px;
+    margin-bottom: 40px;
+}
+
+.video-grid .video-container video {
+    max-width: 100%;
+}
+
+/* Rotated video for bear video 1 */
+.rotated-video {
+    transform: rotate(90deg);
+}
+
+@media (max-width: 768px) {
+    .nerf-visualization-grid,
+    .nerf-training-grid,
+    .video-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .nerf-training-grid .image-container img {
+        min-height: 200px;
+    }
+    
+    .nerf-visualization-grid .image-container img {
+        min-height: 250px;
+    }
+}
+
+/* Print Styles */
+@media print {
+    * {
+        -webkit-print-color-adjust: exact !important;
+        color-adjust: exact !important;
+    }
+    
+    body {
+        background: white !important;
+        font-size: 12pt;
+        line-height: 1.4;
+        color: #000 !important;
+    }
+    
+    .container {
+        max-width: none;
+        padding: 0;
+        margin: 0;
+    }
+    
+    /* Hide navigation for print */
+    .tab-navigation {
+        display: none !important;
+    }
+    
+    /* Show all tab content for print */
+    .tab-content {
+        display: block !important;
+        page-break-after: always;
+    }
+    
+    .tab-content:last-child {
+        page-break-after: avoid;
+    }
+    
+    /* Header adjustments */
+    header {
+        padding: 20px 0;
+        margin-bottom: 20px;
+        page-break-after: avoid;
+    }
+    
+    header h1 {
+        font-size: 24pt;
+        color: #333 !important;
+    }
+    
+    header::after {
+        display: none;
+    }
+    
+    /* Section styling */
+    .project-section {
+        margin: 20px 0;
+        padding: 15px 0;
+        border-bottom: 1px solid #ccc;
+        page-break-inside: avoid;
+    }
+    
+    .project-section h3 {
+        font-size: 18pt;
+        margin-bottom: 10px;
+        color: #333 !important;
+    }
+    
+    .project-subsection {
+        margin: 15px 0;
+        page-break-inside: avoid;
+    }
+    
+    .project-subsection h4 {
+        font-size: 14pt;
+        margin-bottom: 8px;
+        color: #444 !important;
+    }
+    
+    .project-subsection h5 {
+        font-size: 12pt;
+        margin-bottom: 6px;
+        color: #555 !important;
+    }
+    
+    /* Image adjustments */
+    .project-images {
+        margin: 10px 0;
+    }
+    
+    .image-container img {
+        max-width: 100% !important;
+        height: auto !important;
+        page-break-inside: avoid;
+        border: 1px solid #ddd;
+    }
+    
+    .image-caption {
+        font-size: 10pt;
+        color: #666 !important;
+        text-align: center;
+        margin-top: 5px;
+    }
+    
+    /* Grid adjustments for print */
+    .training-progression-grid,
+    .nerf-training-grid,
+    .hyperparameter-grid,
+    .nerf-visualization-grid {
+        display: grid !important;
+        grid-template-columns: repeat(2, 1fr) !important;
+        gap: 10px;
+        page-break-inside: avoid;
+    }
+    
+    .placeholder-grid,
+    .placeholder-grid-2x2 {
+        display: grid !important;
+        grid-template-columns: 1fr 1fr !important;
+        gap: 10px;
+    }
+    
+    /* Video handling for print */
+    video {
+        display: none !important;
+    }
+    
+    .video-container::after {
+        content: "[Video: " attr(data-video-description) "]";
+        display: block;
+        text-align: center;
+        font-style: italic;
+        color: #666;
+        border: 2px dashed #ccc;
+        padding: 20px;
+        background: #f9f9f9;
+    }
+    
+    /* Text adjustments */
+    p {
+        font-size: 11pt;
+        margin-bottom: 8px;
+        line-height: 1.4;
+    }
+    
+    .section-description {
+        font-size: 12pt;
+        font-style: italic;
+        margin-bottom: 15px;
+    }
+    
+    /* Footer */
+    footer {
+        margin-top: 30px;
+        padding-top: 15px;
+        border-top: 1px solid #ccc;
+        font-size: 10pt;
+        text-align: center;
+    }
+    
+    /* Remove shadows and gradients */
+    .image-container,
+    .video-container,
+    header,
+    .tab-button {
+        box-shadow: none !important;
+        background: white !important;
+    }
+    
+    /* Ensure page breaks */
+    .project-section:nth-child(3n) {
+        page-break-after: always;
+    }
+}
+
 /* Project section styles */
 .project-section {
     margin: 40px 0;

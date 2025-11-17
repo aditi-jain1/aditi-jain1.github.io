@@ -759,6 +759,349 @@ camera_edges = (gradient_magnitude > threshold).astype(np.uint8) * 255</code></p
             </div>
 
             <div id="project4" class="tab-content">
+                <h2>Project 4: Neural Radiance Field!</h2>
+                <div class="project-info">
+                    <!-- Part 0: Camera Calibration and 3D Scanning -->
+                    <div class="project-section">
+                        <h3>Part 0: Camera Calibration and 3D Scanning</h3>
+                        <p class="section-description">
+                            Calibrating camera parameters using ArUco tags and capturing a 3D object scan for NeRF training.
+                        </p>
+                        
+                        <div class="project-subsection">
+                            <h4>Part 0.1: Camera Calibration</h4>
+                            <p>Using ArUco tag detection and OpenCV's calibration pipeline to determine intrinsic camera parameters and distortion coefficients from multiple calibration images.</p>
+                        </div>
+
+                        <div class="project-subsection">
+                            <h4>Part 0.2: 3D Object Scan</h4>
+                            <p>Capturing 30-50 images of a chosen object with an ArUco tag for pose estimation and dataset creation.</p>
+                        </div>
+
+                        <div class="project-subsection">
+                            <h4>Part 0.3: Camera Pose Estimation</h4>
+                            <p>Using the Perspective-n-Point (PnP) problem to estimate camera poses from ArUco tag detections.</p>
+                            <div class="project-images">
+                                <div class="image-grid-compact">
+                                    <div class="image-container">
+                                        <img src="project4_assets/part0_frutsum.png" alt="Camera frustums visualization 1">
+                                        <div class="image-caption">Camera frustums showing poses and images</div>
+                                    </div>
+                                    <div class="image-container">
+                                        <img src="project4_assets/part0_frutsum1.png" alt="Camera frustums visualization 2">
+                                        <div class="image-caption">Alternative view of camera cloud</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="project-subsection">
+                            <h4>Part 0.4: Dataset Creation</h4>
+                            <p>Undistorting images and packaging calibration results into a .npz dataset format for NeRF training.</p>
+                        </div>
+                    </div>
+
+                    <!-- Part 1: Neural Field to 2D Image -->
+                    <div class="project-section">
+                        <h3>Part 1: Fit a Neural Field to a 2D Image</h3>
+                        <p class="section-description">
+                            Creating a neural field that represents a 2D image using an MLP with sinusoidal positional encoding.
+                        </p>
+
+                        <div class="project-subsection">
+                            <h4>Model Architecture</h4>
+                            <p><strong>Network Structure:</strong> Width = 128, Depth = 4 layers</p>
+                            <p><strong>Learning Rate:</strong> 0.01 (1e-2)</p>
+                            <p><strong>Training Epochs:</strong> 2000 iterations</p>
+                            <p><strong>Positional Encoding:</strong> Sinusoidal PE with L=10 max frequency for coordinates</p>
+                            <p><strong>Optimizer:</strong> Adam optimizer with batch size 10k pixels</p>
+                        </div>
+
+                        <div class="project-subsection">
+                            <h4>Training Progression</h4>
+                            <p>Neural field optimization process showing convergence on both provided and custom images.</p>
+                            
+                            <h5>Cat Image Training Progression</h5>
+                            <div class="project-images">
+                                <div class="training-progression-grid">
+                                    <div class="image-container">
+                                        <img src="project4_assets/cat/recon_step_20.png" alt="Cat reconstruction at step 20">
+                                        <div class="image-caption">Step 20</div>
+                                    </div>
+                                    <div class="image-container">
+                                        <img src="project4_assets/cat/recon_step_80.png" alt="Cat reconstruction at step 80">
+                                        <div class="image-caption">Step 80</div>
+                                    </div>
+                                    <div class="image-container">
+                                        <img src="project4_assets/cat/recon_step_200.png" alt="Cat reconstruction at step 200">
+                                        <div class="image-caption">Step 200</div>
+                                    </div>
+                                    <div class="image-container">
+                                        <img src="project4_assets/cat/recon_step_400.png" alt="Cat reconstruction at step 400">
+                                        <div class="image-caption">Step 400</div>
+                                    </div>
+                                    <div class="image-container">
+                                        <img src="project4_assets/cat/recon_step_1000.png" alt="Cat reconstruction at step 1000">
+                                        <div class="image-caption">Step 1000</div>
+                                    </div>
+                                    <div class="image-container">
+                                        <img src="project4_assets/cat/recon_step_1800.png" alt="Cat reconstruction at step 1800">
+                                        <div class="image-caption">Step 1800</div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <h5>Bird Image Training Progression</h5>
+                            <div class="project-images">
+                                <div class="training-progression-grid">
+                                    <div class="image-container">
+                                        <img src="project4_assets/bird/recon_step_20.png" alt="Bird reconstruction at step 20">
+                                        <div class="image-caption">Step 20</div>
+                                    </div>
+                                    <div class="image-container">
+                                        <img src="project4_assets/bird/recon_step_80.png" alt="Bird reconstruction at step 80">
+                                        <div class="image-caption">Step 80</div>
+                                    </div>
+                                    <div class="image-container">
+                                        <img src="project4_assets/bird/recon_step_200.png" alt="Bird reconstruction at step 200">
+                                        <div class="image-caption">Step 200</div>
+                                    </div>
+                                    <div class="image-container">
+                                        <img src="project4_assets/bird/recon_step_400.png" alt="Bird reconstruction at step 400">
+                                        <div class="image-caption">Step 400</div>
+                                    </div>
+                                    <div class="image-container">
+                                        <img src="project4_assets/bird/recon_step_1000.png" alt="Bird reconstruction at step 1000">
+                                        <div class="image-caption">Step 1000</div>
+                                    </div>
+                                    <div class="image-container">
+                                        <img src="project4_assets/bird/recon_step_2000.png" alt="Bird reconstruction at step 2000">
+                                        <div class="image-caption">Step 2000</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="project-subsection">
+                            <h4>Hyperparameter Analysis</h4>
+                            <p>Comparison of different positional encoding frequencies and network widths on the cat image.</p>
+                            <div class="project-images">
+                                <div class="hyperparameter-grid">
+                                    <div class="image-container">
+                                        <img src="project4_assets/cat/f_2_w_32.png" alt="Cat with frequency=2, width=32">
+                                        <div class="image-caption">Low PE frequency (L=2), Low width (32)</div>
+                                    </div>
+                                    <div class="image-container">
+                                        <img src="project4_assets/cat/f_2_w_128.png" alt="Cat with frequency=2, width=128">
+                                        <div class="image-caption">Low PE frequency (L=2), High width (128)</div>
+                                    </div>
+                                    <div class="image-container">
+                                        <img src="project4_assets/cat/f_10_w_32.png" alt="Cat with frequency=10, width=32">
+                                        <div class="image-caption">High PE frequency (L=10), Low width (32)</div>
+                                    </div>
+                                    <div class="image-container">
+                                        <img src="project4_assets/cat/f_10_w_128.png" alt="Cat with frequency=10, width=128">
+                                        <div class="image-caption">High PE frequency (L=10), High width (128)</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="project-subsection">
+                            <h4>PSNR Training Curve</h4>
+                            <div class="project-images">
+                                <div class="image-container">
+                                    <img src="project4_assets/part1_bird_psnr_curve.png" alt="PSNR training curve for bird image">
+                                    <div class="image-caption">PSNR curve showing convergence over training iterations</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Part 2: Neural Radiance Field -->
+                    <div class="project-section">
+                        <h3>Part 2: Fit a Neural Radiance Field from Multi-view Images</h3>
+                        <p class="section-description">
+                            Implementing a complete NeRF pipeline with ray generation, sampling, and volume rendering using the Lego dataset.
+                        </p>
+
+                        <div class="project-subsection">
+                            <h4>Implementation Overview</h4>
+                            <p>The NeRF implementation consists of four key components that work together to synthesize novel views from multi-view images. First, I implemented ray generation by transforming pixel coordinates to world-space rays using camera intrinsics and extrinsics, ensuring proper handling of the camera-to-world transformation matrices. The volume sampling component discretizes each ray into sample points with added perturbation during training to prevent overfitting to fixed locations. The network architecture uses a deeper MLP with sinusoidal positional encoding for both 3D coordinates (L=10) and view directions (L=4), with skip connections to preserve input information throughout the network. Finally, volume rendering implements the discrete approximation of the continuous volume rendering equation, computing transmittance and alpha compositing to generate the final pixel colors from the sampled points along each ray.</p>
+                        </div>
+
+                        <div class="project-subsection">
+                            <h4>Ray and Sample Visualization</h4>
+                            <p>Visualization of camera frustums, rays, and 3D sample points for validation.</p>
+                            <div class="project-images">
+                                <div class="nerf-visualization-grid">
+                                    <div class="image-container">
+                                        <img src="project4_assets/part2_ray1.png" alt="Ray and sample visualization 1">
+                                        <div class="image-caption">Camera frustums with rays and sample points</div>
+                                    </div>
+                                    <div class="image-container">
+                                        <img src="project4_assets/part2_ray2.png" alt="Ray and sample visualization 2">
+                                        <div class="image-caption">Alternative view of ray sampling</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="project-subsection">
+                            <h4>Training Progression</h4>
+                            <p>NeRF training process showing novel view synthesis improvement over iterations on the Lego dataset.</p>
+                            
+                            <h5>Lego NeRF Training Progression</h5>
+                            <div class="project-images">
+                                <div class="nerf-training-grid">
+                                    <div class="image-container">
+                                        <img src="project4_assets/nerf_lego_training/100.png" alt="Lego NeRF at 100 iterations">
+                                        <div class="image-caption">100 iterations</div>
+                                    </div>
+                                    <div class="image-container">
+                                        <img src="project4_assets/nerf_lego_training/200.png" alt="Lego NeRF at 200 iterations">
+                                        <div class="image-caption">200 iterations</div>
+                                    </div>
+                                    <div class="image-container">
+                                        <img src="project4_assets/nerf_lego_training/300.png" alt="Lego NeRF at 300 iterations">
+                                        <div class="image-caption">300 iterations</div>
+                                    </div>
+                                    <div class="image-container">
+                                        <img src="project4_assets/nerf_lego_training/500.png" alt="Lego NeRF at 500 iterations">
+                                        <div class="image-caption">500 iterations</div>
+                                    </div>
+                                    <div class="image-container">
+                                        <img src="project4_assets/nerf_lego_training/800.png" alt="Lego NeRF at 800 iterations">
+                                        <div class="image-caption">800 iterations</div>
+                                    </div>
+                                    <div class="image-container">
+                                        <img src="project4_assets/nerf_lego_training/1200.png" alt="Lego NeRF at 1200 iterations">
+                                        <div class="image-caption">1200 iterations</div>
+                                    </div>
+                                    <div class="image-container">
+                                        <img src="project4_assets/nerf_lego_training/2000.png" alt="Lego NeRF at 2000 iterations">
+                                        <div class="image-caption">2000 iterations</div>
+                                    </div>
+                                    <div class="image-container">
+                                        <img src="project4_assets/nerf_lego_training/ground_truth_target.png" alt="Ground truth target image">
+                                        <div class="image-caption">Ground Truth</div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <h5>PSNR Training Curve</h5>
+                            <div class="project-images">
+                                <div class="image-container">
+                                    <img src="project4_assets/nerf_lego_training/curves.png" alt="Lego NeRF PSNR training curves">
+                                    <div class="image-caption">PSNR validation curve showing training progress</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="project-subsection">
+                            <h4>Novel View Synthesis</h4>
+                            <p>Spherical rendering of the Lego scene using test camera poses.</p>
+                            <div class="project-images">
+                                <div class="video-container" data-video-description="Lego NeRF novel view synthesis - 360° rotation">
+                                    <video controls autoplay muted loop>
+                                        <source src="project4_assets/nerf_lego_training/lego_vid.mp4" type="video/mp4">
+                                        Your browser does not support the video tag.
+                                    </video>
+                                    <div class="image-caption">Lego NeRF novel view synthesis - 360° rotation</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Part 2.6: Own Data -->
+                    <div class="project-section">
+                        <h3>Part 2.6: Training with Your Own Data</h3>
+                        <p class="section-description">
+                            Training NeRF on custom captured object using the dataset from Part 0.
+                        </p>
+
+                        <div class="project-subsection">
+                            <h4>Custom Object NeRF</h4>
+                            <p><strong>Object:</strong> Bear toy captured with custom dataset from Part 0</p>
+                            <p><strong>Experimental Process and Modifications:</strong> Training NeRF on real-world data presented significant challenges that required extensive experimentation and dataset refinement. I experimented with different near and far values extensively, starting with the Lego dataset parameters (near=2.0, far=6.0) but finding they were completely inappropriate for close-range object capture. Through iterative testing, I discovered that much smaller values (near=0.02, far=0.5) worked better for my bear toy setup. The dataset creation process was particularly challenging - I had to redo Part 0 multiple times to ensure my camera calibration and pose estimation were correct. Many of my initial images had to be thrown away due to invalid ArUco tag detections, either from poor lighting, motion blur, or the tag being partially occluded. This forced me to go back and capture additional pictures with more careful attention to lighting conditions and tag visibility. The iterative process of dataset refinement, parameter tuning, and recapture taught me the importance of high-quality input data for successful NeRF training.</p>
+                            <p><strong>Training Details:</strong> Custom camera calibration with ArUco tags, optimized for close-range object capture with 64 samples per ray</p>
+                        </div>
+
+                        <div class="project-subsection">
+                            <h4>Bear NeRF Training Progression</h4>
+                            <div class="project-images">
+                                <div class="nerf-training-grid">
+                                    <div class="image-container">
+                                        <img src="project4_assets/nerf_bear_training/100.png" alt="Bear NeRF at 100 iterations">
+                                        <div class="image-caption">100 iterations</div>
+                                    </div>
+                                    <div class="image-container">
+                                        <img src="project4_assets/nerf_bear_training/200.png" alt="Bear NeRF at 200 iterations">
+                                        <div class="image-caption">200 iterations</div>
+                                    </div>
+                                    <div class="image-container">
+                                        <img src="project4_assets/nerf_bear_training/300.png" alt="Bear NeRF at 300 iterations">
+                                        <div class="image-caption">300 iterations</div>
+                                    </div>
+                                    <div class="image-container">
+                                        <img src="project4_assets/nerf_bear_training/500.png" alt="Bear NeRF at 500 iterations">
+                                        <div class="image-caption">500 iterations</div>
+                                    </div>
+                                    <div class="image-container">
+                                        <img src="project4_assets/nerf_bear_training/800.png" alt="Bear NeRF at 800 iterations">
+                                        <div class="image-caption">800 iterations</div>
+                                    </div>
+                                    <div class="image-container">
+                                        <img src="project4_assets/nerf_bear_training/1200.png" alt="Bear NeRF at 1200 iterations">
+                                        <div class="image-caption">1200 iterations</div>
+                                    </div>
+                                    <div class="image-container">
+                                        <img src="project4_assets/nerf_bear_training/2000.png" alt="Bear NeRF at 2000 iterations">
+                                        <div class="image-caption">2000 iterations</div>
+                                    </div>
+                                    <div class="image-container">
+                                        <img src="project4_assets/nerf_bear_training/ground_truth_target.png" alt="Bear ground truth target">
+                                        <div class="image-caption">Ground Truth</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="project-subsection">
+                            <h4>Training Loss Curve</h4>
+                            <div class="project-images">
+                                <div class="image-container">
+                                    <img src="project4_assets/nerf_bear_training/curves.png" alt="Bear NeRF training curves">
+                                    <div class="image-caption">Training loss and PSNR curves for Bear NeRF</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="project-subsection">
+                            <h4>Final Results</h4>
+                            <p>Novel view synthesis of the bear toy with camera rotation showing 360° views.</p>
+                            <div class="project-images">
+                                <div class="video-grid">
+                                    <div class="video-container" data-video-description="Bear NeRF novel view synthesis - View 1">
+                                        <video controls autoplay muted loop class="rotated-video">
+                                            <source src="project4_assets/nerf_bear_training/bear_vid1.mp4" type="video/mp4">
+                                            Your browser does not support the video tag.
+                                        </video>
+                                        <div class="image-caption">Bear NeRF - View 1</div>
+                                    </div>
+                                    <div class="video-container" data-video-description="Bear NeRF novel view synthesis - View 2">
+                                        <video controls autoplay muted loop>
+                                            <source src="project4_assets/nerf_bear_training/bear_vid2.mp4" type="video/mp4">
+                                            Your browser does not support the video tag.
+                                        </video>
+                                        <div class="image-caption">Bear NeRF - View 2</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
             </div>
 
             <div id="project5" class="tab-content">
