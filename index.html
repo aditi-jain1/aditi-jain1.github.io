@@ -1105,6 +1105,402 @@ camera_edges = (gradient_magnitude > threshold).astype(np.uint8) * 255</code></p
             </div>
 
             <div id="project5" class="tab-content">
+                <h2>Project 5: Flow Matching from Scratch!</h2>
+                <div class="project-info">
+                    <!-- Part A Content -->
+                    <div class="project-section">
+                        <h3>Part A: The Power of Diffusion Models!</h3>
+                        
+                        <h4>Part 0: Setup</h4>
+                        <p>Text prompts and embeddings generated using Hugging Face T5 encoder clusters. Generated prompt embeddings dictionary loaded from .pth file for use throughout the project. Random seed: 100</p>
+                        <div class="project-images">
+                            <div class="image-grid image-grid-2">
+                                <div class="image-container">
+                                    <img class="wide-img" src="project5a_assets/part_0_3_prompts_20_is.png" alt="Generated images with 20 inference steps">
+                                    <div class="image-caption">Generated images with 20 inference steps</div>
+                                </div>
+                                <div class="image-container">
+                                    <img class="wide-img" src="project5a_assets/part_0_3_prompts_40_is.png" alt="Generated images with 40 inference steps">
+                                    <div class="image-caption">Generated images with 40 inference steps</div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <h4>Part 1: Sampling Loops</h4>
+                        
+                        <h5>1.1 Implementing the Forward Process</h5>
+                        <p>Forward function implemented using the diffusion forward process formula. Computes noisy image by scaling the clean image with sqrt(alpha_cumprod) and adding Gaussian noise scaled by sqrt(1 - alpha_cumprod). Uses precomputed alphas_cumprod values from the scheduler.</p>
+                        <div class="project-images">
+                            <div class="image-container">
+                                <img class="wide-img" src="project5a_assets/part_1_1_campinile_3_noise_kevels.png" alt="Campanile at noise levels 250, 500, 750">
+                                <div class="image-caption">Campanile at noise levels [250, 500, 750]</div>
+                            </div>
+                        </div>
+                        
+                        <h5>1.2 Classical Denoising</h5>
+                        <p>Applied Gaussian blur filtering using torchvision.transforms.functional.gaussian_blur to attempt denoising. This classical approach struggles with high noise levels as it cannot recover semantic information lost during the forward process.</p>
+                        <div class="project-images">
+                            <div class="image-container">
+                                <img class="wide-img" src="project5a_assets/part_1_2_all.png" alt="Noisy Campanile images with Gaussian blur denoised versions">
+                                <div class="image-caption">3 noisy Campanile images with Gaussian blur denoised versions</div>
+                            </div>
+                        </div>
+                        
+                        <h5>1.3 One-Step Denoising</h5>
+                        <p>Implemented one-step denoising using the pretrained UNet to predict noise. Computes x_0 estimate by subtracting predicted noise scaled appropriately, then uses the DDPM formula to predict the previous timestep. Results improve significantly over Gaussian blur but degrade with higher noise levels.</p>
+                        <div class="project-images">
+                            <div class="image-container">
+                                <img class="wide-img" src="project5a_assets/part_1_3_250.png" alt="One-step denoising at t=250">
+                                <div class="image-caption">One-step denoising at t=250</div>
+                            </div>
+                        </div>
+                        <div class="project-images">
+                            <div class="image-container">
+                                <img class="wide-img" src="project5a_assets/part_1_3_500.png" alt="One-step denoising at t=500">
+                                <div class="image-caption">One-step denoising at t=500</div>
+                            </div>
+                        </div>
+                        <div class="project-images">
+                            <div class="image-container">
+                                <img class="wide-img" src="project5a_assets/part_1_3_750.png" alt="One-step denoising at t=750">
+                                <div class="image-caption">One-step denoising at t=750</div>
+                            </div>
+                        </div>
+                        
+                        <h5>1.4 Iterative Denoising</h5>
+                        <p>Implemented iterative denoising loop using strided timesteps (starting at 990, stride of 30). At each step, predicts noise using UNet, estimates clean image x_0, then uses DDPM formula to compute next timestep with variance. Iteratively denoises from noisy image to clean image, producing much better results than one-step denoising.</p>
+                        <div class="project-images">
+                            <div class="image-container">
+                                <img class="wide-img" src="project5a_assets/part_1_4_all.png" alt="Iterative denoising process">
+                                <div class="image-caption">Noisy Campanile every 5th loop, final iteratively denoised image, one-step denoised, Gaussian blurred</div>
+                            </div>
+                        </div>
+                        <div class="project-images">
+                            <div class="image-grid image-grid-5">
+                                <div class="image-container">
+                                    <img class="wide-img" src="project5a_assets/part_1_4_90.png" alt="Denoising at step 90">
+                                    <div class="image-caption">Step 90</div>
+                                </div>
+                                <div class="image-container">
+                                    <img class="wide-img" src="project5a_assets/part_1_4_240.png" alt="Denoising at step 240">
+                                    <div class="image-caption">Step 240</div>
+                                </div>
+                                <div class="image-container">
+                                    <img class="wide-img" src="project5a_assets/part_1_4_390.png" alt="Denoising at step 390">
+                                    <div class="image-caption">Step 390</div>
+                                </div>
+                                <div class="image-container">
+                                    <img class="wide-img" src="project5a_assets/part_1_4_540.png" alt="Denoising at step 540">
+                                    <div class="image-caption">Step 540</div>
+                                </div>
+                                <div class="image-container">
+                                    <img class="wide-img" src="project5a_assets/part_1_4_690.png" alt="Denoising at step 690">
+                                    <div class="image-caption">Step 690</div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <h5>1.5 Diffusion Model Sampling</h5>
+                        <p>Generated images from pure noise by starting with random Gaussian noise and running iterative_denoise from i_start=0. The diffusion model learns to denoise random noise into coherent images, effectively generating new samples from the learned data distribution.</p>
+                        <div class="project-images">
+                            <div class="image-container">
+                                <img class="wide-img" src="project5a_assets/part_1_5.png" alt="5 sampled images from a high quality photo">
+                                <div class="image-caption">5 sampled images from "a high quality photo"</div>
+                            </div>
+                        </div>
+                        
+                        <h5>1.6 Classifier-Free Guidance (CFG)</h5>
+                        <p>Implemented CFG by computing both conditional (with prompt) and unconditional (with empty prompt) noise estimates. Final noise estimate combines them as: uncond_noise + scale * (cond_noise - uncond_noise). This amplifies the effect of the text prompt, significantly improving image quality and alignment with the prompt at the cost of reduced diversity.</p>
+                        <div class="project-images">
+                            <div class="image-container">
+                                <img class="wide-img" src="project5a_assets/part_1_6.png" alt="5 images with CFG scale of 7.5">
+                                <div class="image-caption">5 images with CFG scale of 7.5</div>
+                            </div>
+                        </div>
+                        
+                        <h5>1.7 Image-to-image Translation</h5>
+                        <p>Implemented SDEdit algorithm: add noise to original image using forward process, then denoise with iterative_denoise_cfg. Lower noise levels preserve more of the original image structure, while higher levels allow more creative edits. The diffusion model projects the noisy image back onto the natural image manifold.</p>
+                        <div class="project-images">
+                            <div class="image-container">
+                                <img class="wide-img" src="project5a_assets/part_1_7_campanile.png" alt="Campanile edits at noise levels">
+                                <div class="image-caption">Campanile edits at noise levels [1, 3, 5, 7, 10, 20]</div>
+                            </div>
+                        </div>
+                        <div class="project-images">
+                            <div class="image-container">
+                                <img class="wide-img" src="project5a_assets/part_1_7_sydney.png" alt="Sydney Opera House edits">
+                                <div class="image-caption">Sydney Opera House edits at noise levels [1, 3, 5, 7, 10, 20]</div>
+                            </div>
+                        </div>
+                        <div class="project-images">
+                            <div class="image-container">
+                                <img class="wide-img" src="project5a_assets/part_1_7_taj.png" alt="Taj Mahal edits">
+                                <div class="image-caption">Taj Mahal edits at noise levels [1, 3, 5, 7, 10, 20]</div>
+                            </div>
+                        </div>
+                        
+                        <h5>1.7.1 Editing Hand-Drawn and Web Images</h5>
+                        <p>Applied SDEdit to non-realistic images (web images and hand-drawn sketches). Preprocessed images to 64x64 format, then applied the same image-to-image translation process. The diffusion model effectively converts sketches and non-photorealistic images into realistic photos by projecting them onto the natural image manifold.</p>
+                        <div class="project-images">
+                            <div class="image-container">
+                                <img class="wide-img" src="project5a_assets/part_1_7_1_web.png" alt="Web image edited at noise levels">
+                                <div class="image-caption">Web image edited at noise levels [1, 3, 5, 7, 10, 20]</div>
+                            </div>
+                        </div>
+                        <div class="project-images">
+                            <div class="image-container">
+                                <img class="wide-img" src="project5a_assets/part_1_7_1_draw1.png" alt="Hand-drawn image 1 edited">
+                                <div class="image-caption">Hand-drawn image 1 edited at noise levels [1, 3, 5, 7, 10, 20]</div>
+                            </div>
+                        </div>
+                        <div class="project-images">
+                            <div class="image-container">
+                                <img class="wide-img" src="project5a_assets/part_1_7_1_draw2.png" alt="Hand-drawn image 2 edited">
+                                <div class="image-caption">Hand-drawn image 2 edited at noise levels [1, 3, 5, 7, 10, 20]</div>
+                            </div>
+                        </div>
+                        
+                        <h5>1.7.2 Inpainting</h5>
+                        <p>Implemented inpainting following the RePaint algorithm. Modified iterative_denoise_cfg to replace pixels outside the mask with the corresponding noisy pixels from the original image at each timestep. This forces the model to preserve unmasked regions while generating new content in masked areas, creating seamless inpainting results.</p>
+                        <div class="project-images">
+                            <div class="image-container">
+                                <img class="wide-img" src="project5a_assets/part_1_7_2_campanile.png" alt="Campanile inpainted">
+                                <div class="image-caption">Campanile inpainted</div>
+                            </div>
+                        </div>
+                        <div class="project-images">
+                            <div class="image-container">
+                                <img class="wide-img" src="project5a_assets/part_1_7_2_bridge.png" alt="Bridge inpainted">
+                                <div class="image-caption">Bridge inpainted</div>
+                            </div>
+                        </div>
+                        <div class="project-images">
+                            <div class="image-container">
+                                <img class="wide-img" src="project5a_assets/part_1_7_2_eye.png" alt="Eye inpainted">
+                                <div class="image-caption">Eye inpainted</div>
+                            </div>
+                        </div>
+                        
+                        <h5>1.7.3 Text-Conditional Image-to-image Translation</h5>
+                        <p>Extended SDEdit with text conditioning by using specific prompt embeddings instead of the generic "a high quality photo". The diffusion process now guides the image projection toward the semantic content described by the text prompt, allowing controlled transformations (e.g., turning a building into a rocket ship) while maintaining the original image structure.</p>
+                        <div class="project-images">
+                            <div class="image-container">
+                                <img class="wide-img" src="project5a_assets/part_1_7_3_campanile.png" alt="Campanile with text-conditional edits">
+                                <div class="image-caption">Campanile edits with text prompt at noise levels [1, 3, 5, 7, 10, 20]</div>
+                            </div>
+                        </div>
+                        <div class="project-images">
+                            <div class="image-container">
+                                <img class="wide-img" src="project5a_assets/part_1_7_3_bridge.png" alt="Bridge with text-conditional edits">
+                                <div class="image-caption">Bridge with text-conditional edits at noise levels [1, 3, 5, 7, 10, 20]</div>
+                            </div>
+                        </div>
+                        <div class="project-images">
+                            <div class="image-container">
+                                <img class="wide-img" src="project5a_assets/part_1_7_3_eye.png" alt="Eye with text-conditional edits">
+                                <div class="image-caption">Eye with text-conditional edits at noise levels [1, 3, 5, 7, 10, 20]</div>
+                            </div>
+                        </div>
+                        
+                        <h5>1.8 Visual Anagrams</h5>
+                        <p>Implemented visual anagrams by computing two noise estimates: one from the normal image with prompt 1, and one from the flipped image with prompt 2 (then flipped back). Averaged the two noise estimates to create a composite that looks like one prompt when viewed normally and another when flipped upside down. This creates optical illusions where the same image reveals different content based on orientation.</p>
+                        <div class="project-images">
+                            <div class="image-container">
+                                <img class="wide-img" src="project5a_assets/part_1_8_im1.png" alt="Visual anagram illusion 1">
+                                <div class="image-caption">Visual anagram illusion 1: ('an oil painting of a desert at sunset', 'a photo of a bustling city street at night')</div>
+                            </div>
+                        </div>
+                        <div class="project-images">
+                            <div class="image-container">
+                                <img class="wide-img" src="project5a_assets/part_1_8_im2.png" alt="Visual anagram illusion 2">
+                                <div class="image-caption">Visual anagram illusion 2: ('a photo of a woman smiling in natural light', 'a man wearing a long coat')</div>
+                            </div>
+                        </div>
+                        
+                        <h5>1.9 Hybrid Images</h5>
+                        <p>Implemented hybrid images using factorized diffusion. Computed noise estimates for two different prompts, then combined them by taking low frequencies (via Gaussian blur) from one estimate and high frequencies (original minus low-pass) from the other. This creates images that appear as one prompt when viewed from far away (low frequencies) and another when viewed up close (high frequencies).</p>
+                        <div class="project-images">
+                            <div class="image-container">
+                                <img class="wide-img" src="project5a_assets/part_1_9_im1.png" alt="Hybrid image 1">
+                                <div class="image-caption">Hybrid image 1: ('an oil painting of a desert at sunset', 'a photo of a bustling city street at night')</div>
+                            </div>
+                        </div>
+                        <div class="project-images">
+                            <div class="image-container">
+                                <img class="wide-img" src="project5a_assets/part_1_9_im2.png" alt="Hybrid image 2">
+                                <div class="image-caption">Hybrid image 2: ('a photo of a woman smiling in natural light', 'a high quality photo of a forest trail')</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Part B Content -->
+                    <div class="project-section">
+                        <h3>Part 1: Training a Single-Step Denoising UNet</h3>
+                        <p>Let's warmup by building a simple one-step denoiser. Given a noisy image, we aim to train a denoiser such that it maps to a clean image. To do so, we can optimize over an L2 loss.</p>
+                        
+                        <h4>1.1 Implementing the UNet</h4>
+                        <p>In this project, we implement the denoiser as a UNet. It consists of a few downsampling and upsampling blocks with skip connections.</p>
+                        
+                        <h4>1.2 Using the UNet to Train a Denoiser</h4>
+                        <p>Recall that we aim to solve the following denoising problem: Given a noisy image, we aim to train a denoiser such that it maps to a clean image. To do so, we can optimize over an L2 loss.</p>
+                        
+                        <div class="project-images">
+                            <div class="image-container">
+                                <img class="wide-img" src="project5_assets/noising_1_2.png" alt="Noising process visualization">
+                                <div class="image-caption">Noising process with different sigma values</div>
+                            </div>
+                        </div>
+                        
+                        <h5>1.2.1 Training</h5>
+                        <p><strong>Objective:</strong> Train a denoiser to denoise noisy image with noise applied to a clean image.</p>
+                        <p><strong>Dataset and dataloader:</strong> Use the MNIST dataset via torchvision.datasets.MNIST. Train only on the training set. Shuffle the dataset before creating the dataloader. Recommended batch size: 256. We'll train over our dataset for 5 epochs.</p>
+                        <p><strong>Model:</strong> Use the UNet architecture with recommended hidden dimension D = 128.</p>
+                        <p><strong>Optimizer:</strong> Use Adam optimizer with learning rate of 1e-4.</p>
+                        
+                        <div class="project-images">
+                                <div class="image-container">
+                                    <img class="wide-img" src="project5_assets/curve_1_2_1.png" alt="Training loss curve for single-step denoising">
+                                    <div class="image-caption">Training loss curve</div>
+                                </div>
+                        </div>
+                        <div class="project-images">
+                                <div class="image-container">
+                                    <img class="wide-img" src="project5_assets/part_1_2_1_denoising_epoch1.png" alt="Denoising results after epoch 1">
+                                    <div class="image-caption">Epoch 1 results</div>
+                                </div>
+                        </div>
+                        <div class="project-images">
+                                <div class="image-container">
+                                    <img class="wide-img" src="project5_assets/part_1_2_1_denoising_epoch2.png" alt="Denoising results after epoch 2">
+                                    <div class="image-caption">Epoch 5 results</div>
+                            </div>
+                        </div>
+                        
+                        <h5>1.2.2 Out-of-Distribution Testing</h5>
+                        <p>Our denoiser was trained on MNIST digits noised with specific noise levels. Let's see how the denoiser performs on different noise levels that it wasn't trained for.</p>
+                        
+                        <div class="project-images">
+                            <div class="image-container">
+                                <img class="wide-img" src="project5_assets/part_1_2_2.png" alt="Out-of-distribution testing results">
+                                <div class="image-caption">Denoising results on different noise levels</div>
+                            </div>
+                        </div>
+                        
+                        <h5>1.2.3 Denoising Pure Noise</h5>
+                        <p>To make denoising a generative task, we'd like to be able to denoise pure, random Gaussian noise. We can think of this as starting with a blank canvas and denoising it to get a clean image.</p>
+                        
+                        <div class="project-images">
+                                <div class="image-container">
+                                    <img class="wide-img" src="project5_assets/part_1_2_3_epoch1.png" alt="Pure noise denoising epoch 1">
+                                    <div class="image-caption">Epoch 1</div>
+                                </div>
+                        </div>
+                        <div class="project-images">
+                                <div class="image-container">
+                                    <img class="wide-img" src="project5_assets/part_1_2_3_epoch2.png" alt="Pure noise denoising epoch 2">
+                                    <div class="image-caption">Epoch 2</div>
+                                </div>
+                        </div>
+                        <div class="project-images">
+                                <div class="image-container">
+                                    <img class="wide-img" src="project5_assets/part_1_2_3_curves.png" alt="Pure noise denoising training curves">
+                                    <div class="image-caption">Training curves</div>
+                                </div>
+                            </div>
+                        <p><strong>A brief description of the patterns observed in the generated outputs and explanations for why they may exist:</strong> All generated images look the same because the model converges to the average of the training data. Without any conditioning signal (like class labels or text prompts), the model learns to predict the mean digit pattern that minimizes the loss across all possible outputs. With more epochs, this convergence to the average becomes clearer as the model becomes more confident in predicting the same average pattern for all inputs.</p>
+                    </div>
+
+                    <div class="project-section">
+                        <h3>Part 2: Training a Flow Matching Model</h3>
+                        <p>We just saw that one-step denoising does not work well for generative tasks. Instead, we need to iteratively denoise the image, and we will do so with flow matching. Here, we will iteratively denoise an image by training a UNet model to predict the 'flow' from our noisy data to clean data.</p>
+                        
+                        <h4>2.1 Adding Time Conditioning to UNet</h4>
+                        <p>We need a way to inject scalar time into our UNet model to condition it. This uses a new operator called FCBlock (fully-connected block) which we use to inject the conditioning signal into the UNet.</p>
+                        
+                        <h4>2.2 Training the UNet</h4>
+                        <p><strong>Objective:</strong> Train a time-conditioned UNet to predict the flow at given time given a noisy image and a timestep.</p>
+                        <p><strong>Dataset and dataloader:</strong> Use the MNIST dataset via torchvision.datasets.MNIST. Train only on the training set. Shuffle the dataset before creating the dataloader. Recommended batch size: 64.</p>
+                        <p><strong>Model:</strong> Use the time-conditioned UNet architecture with recommended hidden dimension D = 64.</p>
+                        <p><strong>Optimizer:</strong> Use Adam optimizer with an initial learning rate of 1e-2. We will be using an exponential learning rate decay scheduler with a gamma. This can be implemented using scheduler = torch.optim.lr_scheduler.ExponentialLR(...).</p>
+                        
+                        <div class="project-images">
+                            <div class="image-container">
+                                <img class="wide-img" src="project5_assets/curve_2_2.png" alt="Training curve for time-conditioned UNet">
+                                <div class="image-caption">Training loss curve for time-conditioned UNet</div>
+                            </div>
+                        </div>
+                        
+                        <h4>2.3 Sampling from the UNet</h4>
+                        <p>We can now use our UNet for iterative denoising! The results would not be perfect, but legible digits should emerge.</p>
+                        
+                        <div class="project-images">
+                            <div class="image-container">
+                                <img class="wide-img" src="project5_assets/part_2_3.png" alt="Sampling results from time-conditioned UNet">
+                                <div class="image-caption">Sampling results for 1, 5, and 10 epochs</div>
+                            </div>
+                        </div>
+                        
+                        <h4>2.4 Adding Class-Conditioning to UNet</h4>
+                        <p>To make the results better and give us more control for image generation, we can also optionally condition our UNet on the class of the digit 0-9. This will require adding 2 more FCBlocks to our UNet.</p>
+                        
+                        <h4>2.5 Training the UNet</h4>
+                        <p>Training for this section will be the same as time-only, with the only difference being the conditioning vector and doing unconditional generation periodically.</p>
+                        
+                        <div class="project-images">
+                            <div class="image-container">
+                                <img class="wide-img" src="project5_assets/part_2_5.png" alt="Class-conditioned UNet training curve">
+                                <div class="image-caption">Training loss curve for class-conditioned UNet</div>
+                            </div>
+                        </div>
+                        
+                        <h4>2.6 Sampling from the UNet</h4>
+                        <p>Now we will sample with class-conditioning and will use classifier-free guidance.</p>
+                        
+                        <div class="project-images">
+                            <div class="image-grid image-grid-3">
+                                <div class="image-container">
+                                    <img class="wide-img" src="project5_assets/part_2_6_epoch1.png" alt="Class-conditioned sampling epoch 1">
+                                    <div class="image-caption">Epoch 1 (with scheduler)</div>
+                                </div>
+                                <div class="image-container">
+                                    <img class="wide-img" src="project5_assets/part_2_6_epoch5.png" alt="Class-conditioned sampling epoch 5">
+                                    <div class="image-caption">Epoch 5 (with scheduler)</div>
+                                </div>
+                                <div class="image-container">
+                                    <img class="wide-img" src="project5_assets/part_2_6_epoch10.png" alt="Class-conditioned sampling epoch 10">
+                                    <div class="image-caption">Epoch 10 (with scheduler)</div>
+                                </div>
+                            </div>
+                            
+                            <h5>Without Learning Rate Scheduler</h5>
+                            <p>Experimenting with removing the exponential learning rate scheduler to simplify training.</p>
+                            <div class="project-images">
+                                <div class="image-grid image-grid-3" style="margin-top: 20px;">
+                                <div class="image-container">
+                                    <img class="wide-img" src="project5_assets/part_2_6_no_scheduler_epoch_1.png" alt="No scheduler epoch 1">
+                                    <div class="image-caption">Epoch 1 (no scheduler)</div>
+                                </div>
+                                <div class="image-container">
+                                    <img class="wide-img" src="project5_assets/part_2_6_no_scheduler_epoch_5.png" alt="No scheduler epoch 5">
+                                    <div class="image-caption">Epoch 5 (no scheduler)</div>
+                                </div>
+                                <div class="image-container">
+                                    <img class="wide-img" src="project5_assets/part_2_6_no_scheduler_epoch_10.png" alt="No scheduler epoch 10">
+                                    <div class="image-caption">Epoch 10 (no scheduler)</div>
+                                </div>
+                                </div>
+                            </div>
+                            <div class="project-images">
+                                <div class="image-container">
+                                    <img class="wide-img" src="project5_assets/part_2_6_no_scheduler_scurves.png" alt="No scheduler training curves">
+                                    <div class="image-caption">Training curves (no scheduler)</div>
+                                </div>
+                            </div>
+                            <p><strong>Can we get rid of the annoying learning rate scheduler? Simplicity is the best. Please try to maintain the same performance after removing the exponential learning rate scheduler. Show your visualization after training without the scheduler and provide a description of what you did to compensate for the loss of the scheduler.</strong></p>
+                            <p>To compensate for removing the exponential learning rate scheduler, I maintained the same initial learning rate (1e-2) throughout training without decay. The training curves show that without the scheduler, the model still achieves similar performance. The loss decreases steadily and the generated samples remain high quality. While the scheduler helps with fine-tuning in later epochs, a constant learning rate works well for this task, especially when training for a fixed number of epochs. The simplicity of a constant learning rate makes the training process more straightforward without significant performance degradation.</p>
+                        </div>
+                    </div>
+                </div>
             </div>
         </main>
 
